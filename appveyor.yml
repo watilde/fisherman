@@ -1,0 +1,19 @@
+environment:
+    global:
+        CYG_ROOT: C:\cygwin
+        CYG_MIRROR: http://cygwin.mirror.constant.com
+        CYG_CACHE: C:\cygwin\var\cache\setup
+        CYG_BASH: C:\cygwin\bin\bash
+
+cache:
+    - '%CYG_CACHE%'
+
+init:
+    - git config --global core.autocrlf input
+
+install:
+    - ps: 'Start-FileDownload "http://cygwin.com/setup-x86.exe" -FileName "setup-x86.exe"'
+    - 'setup-x86.exe --quiet-mode --no-shortcuts --only-site --root "%CYG_ROOT%" --site "%CYG_MIRROR%" --local-package-dir "%CYG_CACHE%" --packages make,fish > NUL 2>&1'
+
+build_script:
+    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER; exec 0</dev/null;  make && fish -c \"fisher i fishery/fishtape; fishtape test/*.fish\""'
